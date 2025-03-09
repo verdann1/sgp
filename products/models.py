@@ -49,3 +49,26 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
+class MaintenanceStock(models.Model):
+    product = models.OneToOneField(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='maintenance_stock',
+        verbose_name='Produto'
+    )
+    quantity = models.PositiveIntegerField(default=0, verbose_name='Quantidade em Estoque')
+    location = models.CharField(max_length=100, null=True, blank=True, verbose_name='Localização')
+    minimum_stock = models.PositiveIntegerField(default=0, verbose_name='Estoque Mínimo')
+    last_updated = models.DateTimeField(auto_now=True, verbose_name='Última Atualização')
+
+    class Meta:
+        verbose_name = 'Estoque de Manutenção'
+        verbose_name_plural = 'Estoques de Manutenção'
+
+    def __str__(self):
+        return f"Estoque de {self.product.title}"
+
+    def is_below_minimum(self):
+        """Verifica se o estoque está abaixo do nível mínimo."""
+        return self.quantity < self.minimum_stock
